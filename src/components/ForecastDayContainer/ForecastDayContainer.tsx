@@ -47,7 +47,7 @@ export const ForecastDayContainer: React.FC<Props> = (props: Props) => {
 
   return (
     <Card elevation={3} className={classes.cardContainer}>
-      <CardHeader title={dayName}></CardHeader>
+      <CardHeader title={dayName} />
       <CardContent>
         <Typography>
           Min Temp: {props.forecastDay.minTemp}

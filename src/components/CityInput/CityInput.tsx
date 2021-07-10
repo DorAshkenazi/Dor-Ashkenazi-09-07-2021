@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 // React Material-UI
 import {
@@ -24,6 +24,11 @@ const useStyles = makeStyles({
     width: "300px",
     backgroundColor: "white",
     border: "1px solid black",
+  },
+  "@global": {
+    '.MuiAutocomplete-option[data-focus="true"]': {
+      background: "white",
+    },
   },
 });
 
@@ -57,17 +62,17 @@ export const CityInput: React.FC = () => {
 
       // Turn on in prod
       // console.log for quick sweep later
-      // handleGetOptions(inputValue).then((res) => {
-      //   const newOptions = res.map((e: any) => {
-      //     return {
-      //       name: e.LocalizedName,
-      //       country: e.Country.LocalizedName,
-      //       key: e.Key,
-      //     };
-      //   });
-      //   setOptions(newOptions);
-      //   setIsLoading(false);
-      // });
+      handleGetOptions(inputValue).then((res) => {
+        const newOptions = res.map((e: any) => {
+          return {
+            name: e.LocalizedName,
+            country: e.Country.LocalizedName,
+            key: e.Key,
+          };
+        });
+        setOptions(newOptions);
+        setIsLoading(false);
+      });
     }
   };
 
@@ -89,12 +94,13 @@ export const CityInput: React.FC = () => {
           handleSelectedCityChange(inputValue);
         }
       }}
-      getOptionSelected={(option, value) => option.name === value.name}
+      getOptionSelected={(option, value) => {
+        return true;
+      }}
       getOptionLabel={(option) => option.name}
       options={options}
       value={selectedCity}
       loading={isLoading}
-      autoComplete={true}
       renderOption={(option) => (
         <>
           <Typography>{option.name}</Typography>

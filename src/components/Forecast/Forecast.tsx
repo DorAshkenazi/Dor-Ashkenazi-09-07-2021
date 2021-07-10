@@ -15,7 +15,7 @@ import { APIKey, rootUrl } from "../../models/AccuWeather";
 import ForecastDay from "../../models/ForecastDay";
 
 // Stubs from API
-import fiveDayForecast from "../../accuweatherStubs/fiveDayForecast.json";
+// import fiveDayForecast from "../../accuweatherStubs/fiveDayForecast.json";
 
 const getForecast = async (key: number, isMetric: boolean) => {
   let url = `${rootUrl}forecasts/v1/daily/5day/${key}?apikey=${APIKey}&metric=${isMetric}`;
@@ -46,36 +46,37 @@ export const Forecast: React.FC = () => {
 
   useEffect(() => {
     if (selectedCity.key) {
-      const forecastArray: ForecastDay[] = fiveDayForecast.DailyForecasts.map(
-        (day: any) => {
-          return {
-            minTemp: day.Temperature.Minimum.Value,
-            maxTemp: day.Temperature.Maximum.Value,
-            dayPhrase: day.Day.IconPhrase,
-            nightPhrase: day.Night.IconPhrase,
-            date: day.Date,
-          };
-        }
-      );
+      // const forecastArray: ForecastDay[] = fiveDayForecast.DailyForecasts.map(
+      //   (day: any) => {
+      //     return {
+      //       minTemp: day.Temperature.Minimum.Value,
+      //       maxTemp: day.Temperature.Maximum.Value,
+      //       dayPhrase: day.Day.IconPhrase,
+      //       nightPhrase: day.Night.IconPhrase,
+      //       date: day.Date,
+      //     };
+      //   }
+      // );
 
-      setForecast(forecastArray);
+      // setForecast(forecastArray);
 
-      //   getForecast(selectedCity.key, isMetric).then((res) => {
-      //   const forecastArray: ForecastDay[] = res.DailyForecasts.map(
-      //     (day: any) => {
-      //       return {
-      //         minTemp: day.Temperature.Minimum.Value,
-      //         maxTemp: day.Temperature.Maximum.Value,
-      //         dayPhrase: day.Day.IconPhrase,
-      //         nightPhrase: day.Night.IconPhrase,
-      //       };
-      //     }
-      //   );
+      getForecast(selectedCity.key, isMetric).then((res) => {
+        const forecastArray: ForecastDay[] = res.DailyForecasts.map(
+          (day: any) => {
+            return {
+              minTemp: day.Temperature.Minimum.Value,
+              maxTemp: day.Temperature.Maximum.Value,
+              dayPhrase: day.Day.IconPhrase,
+              nightPhrase: day.Night.IconPhrase,
+              date: day.Date,
+            };
+          }
+        );
 
-      //   setForecast(forecastArray);
-      // });
+        setForecast(forecastArray);
+      });
     }
-  }, [selectedCity]);
+  }, [isMetric, selectedCity]);
 
   return (
     <div className={classes.rootContainer}>
