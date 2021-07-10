@@ -3,10 +3,10 @@ import React, { useState, useEffect } from "react";
 // React Material-UI
 import {
   AppBar,
-  Button,
   makeStyles,
   Toolbar,
   Typography,
+  useMediaQuery,
 } from "@material-ui/core";
 
 // React Router
@@ -14,6 +14,9 @@ import { useHistory, useLocation } from "react-router";
 
 // Models
 import { Pages } from "../../models/Pages";
+
+// Components
+import { NavBarMenuControls } from "../NavBarMenuControls/NavBarMenuControls";
 
 const useStyles = makeStyles({
   title: {
@@ -25,6 +28,7 @@ export const NavBar: React.FC = () => {
   const classes = useStyles();
   let location = useLocation();
   const history = useHistory();
+  const matches = useMediaQuery("(min-width:450px)");
   const [currentPage, setCurrentPage] = useState<Pages>(Pages.HOME);
 
   const handleNavigation = (page: Pages) => {
@@ -49,20 +53,11 @@ export const NavBar: React.FC = () => {
         <Typography variant="h6" className={classes.title}>
           Herolo Weather Task
         </Typography>
-        <Button
-          variant={currentPage === Pages.HOME ? "outlined" : undefined}
-          color="inherit"
-          onClick={() => handleNavigation(Pages.HOME)}
-        >
-          Home
-        </Button>
-        <Button
-          variant={currentPage === Pages.FAVORITES ? "outlined" : undefined}
-          color="inherit"
-          onClick={() => handleNavigation(Pages.FAVORITES)}
-        >
-          Favorites
-        </Button>
+        <NavBarMenuControls
+          isScreenSizeSmall={matches}
+          currentPage={currentPage}
+          handleNavigation={handleNavigation}
+        />
       </Toolbar>
     </AppBar>
   );
