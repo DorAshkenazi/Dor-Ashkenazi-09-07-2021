@@ -23,6 +23,9 @@ import { openSnackbar } from "../../redux/snackbarSlice";
 import handleGetOptions from "../../services/autocompleteService";
 import getLocationByGeoposition from "../../services/locationService";
 
+// Router
+import { useHistory, useLocation } from "react-router";
+
 const useStyles = makeStyles({
   autocompleteContainer: {
     width: "300px",
@@ -39,6 +42,8 @@ const useStyles = makeStyles({
 export const CityInput: React.FC = () => {
   const dispatch = useDispatch();
   const classes = useStyles();
+  const location = useLocation();
+  const history = useHistory();
   const selectedCity = useSelector((state: any) => state.selectedCity);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [options, setOptions] = useState<City[]>([]);
@@ -76,25 +81,27 @@ export const CityInput: React.FC = () => {
   };
 
   useEffect(() => {
-    getLocationByGeoposition()
-      .then((res) => {
-        dispatch(
-          setSelectedCity({
-            name: res.LocalizedName,
-            country: res.Country.LocalizedName,
-            key: res.Key,
-          })
-        );
-      })
-      .catch(() => {
-        dispatch(
-          openSnackbar({
-            message: "Error in getting position for initial city",
-            color: "red",
-          })
-        );
-      });
-  }, [dispatch]);
+    if (!location.state) {
+      getLocationByGeoposition()
+        .then((res) => {
+          dispatch(
+            setSelectedCity({
+              name: res.LocalizedName,
+              country: res.Country.LocalizedName,
+              key: res.Key,
+            })
+          );
+        })
+        .catch(() => {
+          dispatch(
+            openSnackbar({
+              message: "Error in getting position for initial city",
+              color: "red",
+            })
+          );
+        });
+    }
+  }, [dispatch, location.state]);
 
   return (
     <Autocomplete

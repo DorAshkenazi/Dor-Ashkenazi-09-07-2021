@@ -53,7 +53,10 @@ export const FavoriteCard: React.FC<Props> = (props: Props) => {
 
   const handleMoveToHome = () => {
     dispatch(setSelectedCity(props.favorite));
-    history.push("/");
+    history.push({
+      pathname: "/",
+      state: props.favorite.key,
+    });
   };
 
   useEffect(() => {
