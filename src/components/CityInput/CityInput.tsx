@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // React Material-UI
 import {
@@ -13,11 +13,15 @@ import SearchIcon from "@material-ui/icons/Search";
 
 // Models
 import City from "../../models/City";
-import { rootUrl, APIKey } from "../../models/AccuWeather";
 
 // Redux
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedCity } from "../../redux/selectedCitySlice";
+import { openSnackbar } from "../../redux/snackbarSlice";
+
+// Services
+import handleGetOptions from "../../services/autocompleteService";
+import getLocationByGeoposition from "../../services/locationService";
 
 const useStyles = makeStyles({
   autocompleteContainer: {
@@ -37,44 +41,60 @@ export const CityInput: React.FC = () => {
   const classes = useStyles();
   const selectedCity = useSelector((state: any) => state.selectedCity);
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [options, setOptions] = useState<City[]>([
-    // return to empty when prod
-    // console.log for quick sweep later
-    { name: "Tel Aviv", country: "Israel", key: 215854 },
-    { name: "Venice", country: "Italy", key: 216711 },
-  ]);
+  const [options, setOptions] = useState<City[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleSelectedCityChange = (city: City) => {
     dispatch(setSelectedCity(city));
   };
 
-  const handleGetOptions = async (cityNameQuery: string) => {
-    let url = `${rootUrl}locations/v1/cities/autocomplete?apikey=${APIKey}&q=${cityNameQuery}`;
-    const response = await fetch(url);
-    const body = await response.json();
-    return body;
-  };
-
   const handleInputChange = (inputValue: string) => {
     if (inputValue.length >= 3) {
       setIsLoading(true);
 
-      // Turn on in prod
-      // console.log for quick sweep later
-      handleGetOptions(inputValue).then((res) => {
-        const newOptions = res.map((e: any) => {
-          return {
-            name: e.LocalizedName,
-            country: e.Country.LocalizedName,
-            key: e.Key,
-          };
+      handleGetOptions(inputValue)
+        .then((res) => {
+          const newOptions = res.map((e: any) => {
+            return {
+              name: e.LocalizedName,
+              country: e.Country.LocalizedName,
+              key: e.Key,
+            };
+          });
+          setOptions(newOptions);
+          setIsLoading(false);
+        })
+        .catch(() => {
+          dispatch(
+            openSnackbar({
+              message: "Error in call to autocomplete API on AccuWeather",
+              color: "red",
+            })
+          );
         });
-        setOptions(newOptions);
-        setIsLoading(false);
-      });
     }
   };
+
+  useEffect(() => {
+    getLocationByGeoposition()
+      .then((res) => {
+        dispatch(
+          setSelectedCity({
+            name: res.LocalizedName,
+            country: res.Country.LocalizedName,
+            key: res.Key,
+          })
+        );
+      })
+      .catch(() => {
+        dispatch(
+          openSnackbar({
+            message: "Error in getting position for initial city",
+            color: "red",
+          })
+        );
+      });
+  }, [dispatch]);
 
   return (
     <Autocomplete

@@ -29,12 +29,12 @@ export const FavoritesPage: React.FC = () => {
           <FavoriteCard key={favorite.key} favorite={favorite} />
         ))
       ) : (
-        <>
+        <div>
           <Typography
             variant="h3"
             style={{ textAlign: "center", color: "white", marginTop: "20px" }}
           >
-            Favorite list empty
+            Favorite list empty.
           </Typography>
           <Typography
             variant="h3"
@@ -42,7 +42,7 @@ export const FavoritesPage: React.FC = () => {
           >
             Add more to manage them here!
           </Typography>
-        </>
+        </div>
       )}
     </div>
   );

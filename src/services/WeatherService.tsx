@@ -6,3 +6,5 @@ export const getWeather = async (cityKey: number) => {
   const body = await response.json();
   return body;
 };
+
+export default getWeather;

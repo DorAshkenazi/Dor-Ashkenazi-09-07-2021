@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 // React Material-UI
 import {
@@ -6,8 +6,10 @@ import {
   CardHeader,
   CardContent,
   makeStyles,
-  CardActionArea,
+  IconButton,
+  CardActions,
 } from "@material-ui/core";
+import ReplyIcon from "@material-ui/icons/Reply";
 
 // Models
 import CityWeather from "../../models/CityWeather";
@@ -20,15 +22,13 @@ import { WeatherDisplay } from "../WeatherDisplay/WeatherDisplay";
 // Services
 import { getWeather } from "../../services/WeatherService";
 
-// Stubs from api
-// import weatherStub from "../../accuweatherStubs/currentWeather.json";
-
 // Router
 import { useHistory } from "react-router";
 
 // Redux
 import { useDispatch } from "react-redux";
 import { setSelectedCity } from "../../redux/selectedCitySlice";
+import { openSnackbar } from "../../redux/snackbarSlice";
 
 interface Props {
   favorite: City;
@@ -42,12 +42,6 @@ const useStyles = makeStyles({
     textAlign: "center",
     minWidth: "250px",
     margin: "20px",
-  },
-  favoriteButton: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-    zIndex: 2,
   },
 });
 
@@ -64,41 +58,45 @@ export const FavoriteCard: React.FC<Props> = (props: Props) => {
 
   useEffect(() => {
     if (props.favorite?.key) {
-      // const weather = weatherStub[0];
-      // setCityWeather({
-      //   text: weather.WeatherText,
-      //   icon: weather.WeatherIcon,
-      //   temp: {
-      //     metric: weather.Temperature.Metric.Value,
-      //     imperial: weather.Temperature.Imperial.Value,
-      //   },
-      // });
-
-      getWeather(props.favorite.key).then((res) => {
-        const cityWeather = res[0];
-        setCityWeather({
-          text: cityWeather.WeatherText,
-          icon: cityWeather.WeatherIcon,
-          temp: {
-            metric: cityWeather.Temperature.Metric.Value,
-            imperial: cityWeather.Temperature.Imperial.Value,
-          },
+      getWeather(props.favorite.key)
+        .then((res) => {
+          const cityWeather = res[0];
+          setCityWeather({
+            text: cityWeather.WeatherText,
+            icon: cityWeather.WeatherIcon,
+            temp: {
+              metric: cityWeather.Temperature.Metric.Value,
+              imperial: cityWeather.Temperature.Imperial.Value,
+            },
+          });
+        })
+        .catch(() => {
+          dispatch(
+            openSnackbar({
+              message: "Error in call to currentconditions API on AccuWeather",
+              color: "red",
+            })
+          );
         });
-      });
     }
-  }, [props.favorite.key]);
+  }, [dispatch, props.favorite.key]);
 
   return (
     <Card className={classes.favoriteCard}>
-      <div className={classes.favoriteButton}>
-        <FavoriteButton city={props.favorite} />
-      </div>
-      <CardActionArea onClick={() => handleMoveToHome()}>
-        <CardHeader title={props.favorite.name} />
-        <CardContent>
-          <WeatherDisplay weather={cityWeather} />
-        </CardContent>
-      </CardActionArea>
+      {cityWeather ? (
+        <CardActions style={{ justifyContent: "space-between" }}>
+          <IconButton onClick={() => handleMoveToHome()}>
+            <ReplyIcon />
+          </IconButton>
+          <FavoriteButton city={props.favorite} />
+        </CardActions>
+      ) : (
+        ""
+      )}
+      <CardHeader title={props.favorite.name} />
+      <CardContent>
+        <WeatherDisplay weather={cityWeather} />
+      </CardContent>
     </Card>
   );
 };

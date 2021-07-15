@@ -1,14 +1,9 @@
-import React, { useEffect } from "react";
-
 // React Material-UI
 import { makeStyles } from "@material-ui/core/styles";
 
 // Components
 import { CityInput } from "../CityInput/CityInput";
 import { CityContainer } from "../CityContainer/CityContainer";
-
-// Redux
-import { useSelector } from "react-redux";
 
 const useStyles = makeStyles({
   layout: {
@@ -29,11 +24,6 @@ const useStyles = makeStyles({
 
 export const HomePage: React.FC = () => {
   const classes = useStyles();
-  const selectedCity = useSelector((state: any) => state.selectedCity);
-
-  useEffect(() => {
-    //console.log(selectedCity);
-  }, [selectedCity]);
 
   return (
     <div className={classes.layout}>
